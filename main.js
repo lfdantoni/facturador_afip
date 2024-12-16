@@ -10,13 +10,15 @@ const selectors = require('./Domain/Constants/afip_selectors');
 const constants = require('./Domain/Constants/afip_constants');
 const InvoiceFactory = require('./Domain/InvoiceFactory');
 const Logger = require('./logger');
+const { sleep } = require('./Application/utils');
 const log = new Logger();
 
 const run = async (contribuyente, comprobantes, commitInvoice) => {
 
-    const browser = await puppeteer.launch({headless: false /*, slowMo: 100, devtools: true,*/})
+    const browser = await puppeteer.launch({headless: false, args: [`--window-size=1280,1024`] /*, slowMo: 100, devtools: true,*/})
     const page = await browser.newPage()
-    await page.setViewport({ width: 900, height: 2000 });
+
+    await page.setViewport({ width: 1280, height: 2000 });
     await page.goto(constants.url);
 
     const getNewPageWhenLoaded =  async () => {
@@ -43,6 +45,8 @@ const run = async (contribuyente, comprobantes, commitInvoice) => {
         await logIn(page, contribuyente);
 
         log.phase('ENTRANDO A RCEL');
+        await page.waitForSelector(selectors.navegacion.verTodasApps, {visible: true});
+        await page.click(selectors.navegacion.verTodasApps);
         await page.waitForSelector(selectors.navegacion.rcel, {visible: true});
         await page.click(selectors.navegacion.rcel);
         const newPagePromise = getNewPageWhenLoaded(); // RCEL se abre en una nueva pestaña!
@@ -51,11 +55,11 @@ const run = async (contribuyente, comprobantes, commitInvoice) => {
          * @type {Page}
          */
         const newPage = await newPagePromise;
-        await newPage.setViewport({ width: 900, height: 2000 });
+        await newPage.setViewport({ width: 1280, height: 2000 });
 
         /* Capture & manage alert-boxes */
         await newPage.on('dialog', async (dialog) => { 
-            await newPage.waitForTimeout(1500);
+            await sleep(1500);
 
             /* Generar comprobante? */
             if (dialog.message().match(/generar un nuevo comprobante/i)) {
@@ -81,7 +85,7 @@ const run = async (contribuyente, comprobantes, commitInvoice) => {
 
         log.phase('CERRAR SESION Y NAVEGADOR')
         await logOut(page);
-        await page.waitForTimeout(1500);
+        await sleep(1500);
         await browser.close();
 
     } catch (e) {
@@ -120,9 +124,11 @@ const logIn = async (page, contribuyente) => {
  * @param {Page} page 
  */
 const logOut = async (page) => {
-    await page.waitForTimeout(1000);
+    await sleep(1000);
+    await page.click(selectors.navegacion.userMenu);
+    await sleep(1000);
     await page.click(selectors.navegacion.salir);
-    await page.waitForTimeout(1500);
+    await sleep(1500);
 }
 
 /**
@@ -162,13 +168,14 @@ const generateInvoices = async (invoices, commitInvoice,  page) => {
         await page.waitForSelector(selectors.rcel.confirmar, {visible: true}); 
         
         log.step('TIEMPO PARA CORROBORAR: 5 segundos...');
-        await page.waitForTimeout(5000);
+        await sleep(5000);
         await page.click(selectors.rcel.confirmar); 
         
         if (commitInvoice) {
             await page.waitForSelector(selectors.rcel.comprobante_generado);
         }
-        await page.waitForTimeout(1000);
+
+        await sleep(1000);
 
         log.step('Volviendo al menu principal');
         log.step('---------------------------');

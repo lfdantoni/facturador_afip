@@ -6,11 +6,14 @@ module.exports = {
         ingresar: '#F1\\:btnIngresar',
     },
     navegacion: {
-        rcel: 'div[title="rcel"]',
+        verTodasApps: 'a[href="/portal/app/mis-servicios"]',
+        rcel: 'a[title="rcel"]',
         representada: 'input[value="<nombre-contribuyente>"]',
-        salir: 'a[title="Salir"]',
+        userMenu: '#userIconoChico',
+        salir: 'button[title="Salir"]',
     },
     rcel: {
+        ptoVta: '#puntodeventa',
         generar_comprobante: 'a#btn_gen_cmp',
         punto_venta: 'select[name="puntoDeVenta"]',
         tipo_comprobante: 'select[name="universoComprobante"]',

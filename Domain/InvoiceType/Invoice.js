@@ -1,3 +1,4 @@
+const { sleep } = require('../../Application/utils');
 const afip_constants = require('../Constants/afip_constants');
 const afip_selectors = require('../Constants/afip_selectors');
 
@@ -10,7 +11,7 @@ module.exports = class Invoice {
     }
     
     async nextStep() {
-        await this.page.waitForTimeout(1000);
+        await sleep(1000);
         await this.page.click(this.selectors.rcel.continuar);
     }
 
@@ -26,7 +27,7 @@ module.exports = class Invoice {
     async pickInvoiceType(type) {
         const invoiceTypeId = afip_constants.tipo_comprobante[type];
 
-        await this.page.waitForTimeout(1000);
+        await sleep(1000);
         await this.page.select(this.selectors.rcel.tipo_comprobante, invoiceTypeId);
         
         await this.nextStep();

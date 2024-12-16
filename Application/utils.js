@@ -2,6 +2,8 @@ const chalk = require('chalk');
 const fs = require('fs');
 const {Table} = require('console-table-printer');
 
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
 const today = () => {
     const d = new Date();
     return [d.getMonth()+1, d.getDate(), d.getFullYear()]
@@ -43,4 +45,5 @@ module.exports = {
     loadJsonFile,
     countInvoices,
     printInvoicesStats,
+    sleep,
 }
